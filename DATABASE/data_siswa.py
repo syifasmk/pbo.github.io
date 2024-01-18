@@ -1,0 +1,66 @@
+from tkinter import *
+from tkinter import messagebox
+import mysql.connector
+
+class Data_Siswa(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Registrasi Data Siswa")
+        self.geometry("400x300")
+
+        # Koneksi ke database
+        self.db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="",
+            database="registrasi"
+        )
+        
+        # Membuat kursor
+        self.cursor = self.db.cursor()
+
+        # Membuat dan menampilkan GUI
+        self.tampilan_gui()
+
+    def tampilan_gui(self):
+        Label(self, text="NIS").grid(row=0, column=0, padx=10, pady=10)
+        self.nis_entry = Entry(self, width=50)
+        self.nis_entry.grid(row=0, column=1, padx=10, pady=10)
+        Label(self, text="Nama").grid(row=1, column=0, padx=10, pady=10)
+
+        self.nama_entry = Entry(self, width=50)
+        self.nama_entry.grid(row=1, column=1, padx=10, pady=10)
+        Label(self, text="Jurusan").grid(row=2, column=0, padx=10, pady=10)
+        self.jurusan_entry = Entry(self, width=50)
+        self.jurusan_entry.grid(row=2, column=1, padx=10, pady=10)
+        Label(self, text="Alamat").grid(row=3, column=0, padx=10, pady=10)
+        self.alamat_entry = Text(self, width=37, height=5)
+        self.alamat_entry.grid(row=3, column=1, padx=10, pady=10)
+        Button(self, text="Simpan Data", 
+        command=self.simpan_data).grid(row=4, column=0, 
+        columnspan=2, pady=10)
+         
+    def simpan_data(self):
+
+        nis = self.nis_entry.get()
+        nama = self.nama_entry.get()
+        jurusan = self.jurusan_entry.get()
+        alamat = self.alamat_entry.get("1.0", END)
+
+        query = "INSERT INTO siswa (nis, nama, jurusan, alamat) VALUES (%s, %s,   %s, %s)"
+        values = (nis, nama, jurusan, alamat)
+
+        try:
+            self.cursor.execute(query, values)
+            messagebox.showinfo("Sukses", "Data berhasil disimpan!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Terjadi kesalahan: {str(e)}")
+
+        self.nis_entry.delete(0, END)
+        self.nama_entry.delete(0, END)
+        self.jurusan_entry.delete(0, END)
+        self.alamat_entry.delete("1.0", END)
+
+if __name__ == "__main__":
+    app = Data_Siswa()
+    app.mainloop()
